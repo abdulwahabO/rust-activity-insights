@@ -1,4 +1,4 @@
-package io.github.abdulwahabo.rai.extractor;
+package io.github.abdulwahabo.rai.extractor.s3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,87 +1,95 @@
 package io.github.abdulwahabo.rai.extractor;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.CloudWatchLogsEvent;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SequenceWriter;
 
 import io.github.abdulwahabo.rai.extractor.exception.ExtractorException;
 import io.github.abdulwahabo.rai.extractor.exception.GithubClientException;
+import io.github.abdulwahabo.rai.extractor.exception.S3ClientException;
 import io.github.abdulwahabo.rai.extractor.github.GithubEventDto;
 import io.github.abdulwahabo.rai.extractor.github.GithubHttpClient;
+import io.github.abdulwahabo.rai.extractor.s3.S3BucketClient;
+import io.github.abdulwahabo.rai.extractor.s3.S3EventDto;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import software.amazon.awssdk.http.SdkHttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Extractor implements RequestHandler<CloudWatchLogsEvent, Void> {
+public class Extractor {
 
     private static final String EVENTS_API_URL = "https://api.github.com/orgs/rust-lang/events";
+    private static final Path ETAG_STORAGE_FILE = Paths.get("/tmp", "etag.txt");
 
-    // TODO: goto lambda config and increase the running time..
+    private static final String S3_BUCKET_NAME = "github-rustlang-events";
+    private static final String S3_OBJECT_KEY = "rust_activities_data";
+    private Logger logger = LoggerFactory.getLogger(Extractor.class);
 
-    @Override
-    public Void handleRequest(CloudWatchLogsEvent event, Context context) {
+    private GithubHttpClient githubClient;
+    private S3BucketClient s3BucketClient;
+    private ExtractorUtil helper;
 
-        GithubHttpClient.EventsResponse eventsResponse;
-        String eTag = ExtractorHelper.getETag().orElse("");
-        LambdaLogger logger = context.getLogger();
-
-        try {
-            GithubHttpClient httpClient = new GithubHttpClient();
-            Optional<GithubHttpClient.EventsResponse> eventsOptional = httpClient.pollEvents(eTag, EVENTS_API_URL);
-
-            if (eventsOptional.isEmpty()) {
-                logger.log("No new events to process");
-                return null;
-            }
-            eventsResponse = eventsOptional.get();
-        } catch (GithubClientException e) {
-            throw new ExtractorException(e);
-        }
-
-        logger.log("Polled " + eventsResponse.getEvents().size() + " new events from Github");
-        ExtractorHelper.saveEtag(eventsResponse.getETag());
-
-        List<GithubEventDto> githubDtos = eventsResponse.getEvents();
-        List<S3EventDto> s3Dtos = githubDtos.stream().map(ExtractorHelper.mapper).collect(Collectors.toList());
-
-        SdkHttpResponse sdkHttpResponse = exportToS3(s3Dtos);
-        String status = sdkHttpResponse.statusText().orElse("<No status text was returned>");
-        logger.log("S3 response code: " + sdkHttpResponse.statusCode());
-        logger.log("S3 status text: " + status);
-
-        logger.log("Finished run with " + context.getRemainingTimeInMillis() + " milliseconds left");
-        return null;
+    public Extractor(S3BucketClient s3client, GithubHttpClient githubClient, ExtractorUtil helper) {
+        this.s3BucketClient = s3client;
+        this.githubClient = githubClient;
+        this.helper = helper;
     }
 
-    private SdkHttpResponse exportToS3(List<S3EventDto> eventDtos) {
+    private final Function<GithubEventDto, S3EventDto> eventDtoMapper = (githubEventDto -> {
+        S3EventDto s3EventDto = new S3EventDto();
+        s3EventDto.setRepository(githubEventDto.getRepo().getName());
+        LocalDateTime dateTime = LocalDateTime.parse(githubEventDto.getTime());
+        s3EventDto.setDate(dateTime.toLocalDate().toString());
+        s3EventDto.setType(githubEventDto.getType());
+        return s3EventDto;
+    });
+
+    public void extract() throws ExtractorException {
         try {
+            if (!Files.exists(ETAG_STORAGE_FILE)) {
+                Files.createFile(ETAG_STORAGE_FILE);
+            }
 
-            Path path = Files.createTempFile(Paths.get("/tmp"),"s3-data", ".json");
-            File tempFile = new File(path.toUri());
+            String eTag = helper.readFile(ETAG_STORAGE_FILE).orElse("");
+            Optional<GithubHttpClient.EventsResponse> eventsOptional = githubClient.pollEvents(eTag, EVENTS_API_URL);
 
-            ObjectWriter objectWriter = new ObjectMapper().writerFor(S3EventDto.class).withRootValueSeparator("\n");
-            SequenceWriter sequenceWriter = objectWriter.writeValues(tempFile);
-            sequenceWriter.writeAll(eventDtos);
-            sequenceWriter.close();
+            if(eventsOptional.isPresent()) {
+                GithubHttpClient.EventsResponse  eventsResponse = eventsOptional.get();
+                List<GithubEventDto> githubDtos = eventsResponse.getEvents();
+                logger.info("Polled " + githubDtos.size() + " new events from Github");
 
-            SdkHttpResponse sdkHttpResponse = ExtractorHelper.writeToS3(tempFile);
-            Files.delete(tempFile.toPath());
-            return sdkHttpResponse;
+                eTag = eventsResponse.getETag();
+                eTag = eTag.replace("\"", "");  // Remove double quotes.
+                helper.saveToFile(eTag, ETAG_STORAGE_FILE);
 
-        } catch (Exception e) {
+                List<S3EventDto> s3Dtos = githubDtos.stream().map(eventDtoMapper).collect(Collectors.toList());
+                Path path = Files.createTempFile(Paths.get("/tmp"), "s3-data", ".json");
+                File tempFile = new File(path.toUri());
+                prepareFile(s3Dtos, tempFile);
+
+                s3BucketClient.writeFile(tempFile, S3_OBJECT_KEY, S3_BUCKET_NAME);
+            } else {
+                logger.info("No new events from Github API");
+            }
+        } catch (IOException | GithubClientException | S3ClientException e) {
             throw new ExtractorException(e);
         }
+    }
+
+    private void prepareFile(List<S3EventDto> s3Dtos, File file) throws IOException {
+        ObjectWriter objectWriter = new ObjectMapper().writerFor(S3EventDto.class).withRootValueSeparator("\n");
+        SequenceWriter sequenceWriter = objectWriter.writeValues(file);
+        sequenceWriter.writeAll(s3Dtos);
+        sequenceWriter.close();
     }
 }

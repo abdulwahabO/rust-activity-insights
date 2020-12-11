@@ -16,9 +16,6 @@ public class GithubEventDto {
 
     // TODO: Read the Github API overview to know format for time.
 
-    // TODO: To parse this class - Have to specify a collection Type, since Jackson
-    //      can't tell which Collection class to use.
-
     public String getType() {
         return type;
     }

@@ -1,6 +1,6 @@
 package io.github.abdulwahabo.rai.extractor;
 
-public class AppTest {
+public class ExtractorTest {
 
     public void shouldAnswerWithTrue() {
 

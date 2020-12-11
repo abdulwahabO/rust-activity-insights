@@ -1,5 +1,7 @@
 package io.github.abdulwahabo.rai.extractor.github;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.abdulwahabo.rai.extractor.exception.GithubClientException;
 
 import java.io.IOException;
@@ -23,18 +25,33 @@ public class GithubHttpClient {
      */
     public Optional<EventsResponse> pollEvents(String eTag, String url) throws GithubClientException {
 
-        // 1. Get raw JSON or throw Exception or return empty OPT if response is 308.
-        // 2. Parse JSON and return list.
-        // 3.
+        Optional<EventsResponse> eventsResponseOpt = Optional.empty();
 
-        // Get Etag header from response. and set it.
+        try {
+            HttpResponse<String> response = doRequest(url, eTag);
+            String statusCode = String.valueOf(response.statusCode());
 
-        return null;
-    }
+            if (statusCode.startsWith("4")) {
+                throw new GithubClientException("Github API call returned error code: " + statusCode);
+            } else if (statusCode.equals("304")) {
+                return eventsResponseOpt;
+            } else if (statusCode.equals("200")) {
+                EventsResponse eventsResponse = new EventsResponse();
+                Optional<String> eTagOptional = response.headers().firstValue("Etag");
+                eTagOptional.ifPresent(eventsResponse::setETag);
 
-    private GithubEventDto parseJson(String eventJson) {
+                ObjectMapper mapper = new ObjectMapper();
+                TypeReference<List<GithubEventDto>> typeReference = new TypeReference<>(){};
+                List<GithubEventDto> eventDtos = mapper.readValue(response.body(), typeReference);
+                eventsResponse.setEvents(eventDtos);
+                eventsResponseOpt = Optional.of(eventsResponse);
+            }
 
-        return new GithubEventDto();
+        } catch (Exception e) {
+            throw new GithubClientException("Failed to poll new events from Github", e);
+        }
+
+        return eventsResponseOpt;
     }
 
     private HttpResponse<String> doRequest(String url, String etag)
