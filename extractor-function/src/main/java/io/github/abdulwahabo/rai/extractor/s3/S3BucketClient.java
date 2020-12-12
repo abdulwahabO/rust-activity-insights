@@ -31,4 +31,6 @@ public class S3BucketClient {
             throw new S3ClientException("Failed to write file", e);
         }
     }
+
+    // TODO: Add a read method and move to common module.
 }

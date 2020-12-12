@@ -1,14 +1,11 @@
 package io.github.abdulwahabo.rai.extractor.s3;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
+// Rename to EventDto and move to common.
 public class S3EventDto {
 
     private String type;
-
-    @JsonProperty("user_id")
     private String userId;
-
     private String repository;
     private String date;
 
@@ -37,7 +34,7 @@ public class S3EventDto {
     }
 
     /**
-     * Returns date in IS0 8601 format (YYYY-MM-DD)
+     * Returns a date in IS0 8601 format (YYYY-MM-DD)
      */
     public String getDate() {
         return date;

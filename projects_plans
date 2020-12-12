@@ -17,15 +17,13 @@
 	NOTE: If AWS Java SDK 2.0 cannot be used to effectively query by Date, then load all items and do it manually, There are only 
 			365 days in a year after all.
 
-
 >>>>> Frontend: Charts display data for a specific period. The period can be changed using a date range picker.
 
 		--> A doughnut pie chart showing ---> The percentages of activities from the top five repositories for that period.
 
-		--> A grouped bar chart showing ---> 
+		--> A SIMPLE bar chart showing ---> The top five repositories in terms of commits.. use Comparator o
 
 		--> A stripped table with columns ----> Details of each repository for that period.
-				--> Github users on the table should be behind a link that shows a card/modal with their details.
 
   		--> A date range picker (Use date range picker library)
 					----> THIS IS IMPORTANT SO THE PROJECT IS INTERACTIVE, OTHERWISE THE GIF WOULD LOOK DRAB.
@@ -45,8 +43,9 @@
 
 >>> Business Case:
 
-		(Todo: write this)
+		(Todo: write this) -- Not much to say, the real objective of this project is using Apache Spark and AWS.
 
+        // todo -- the pipeline is not very robust and doesn't handle possible error cases.
 
 
 >>> Portfolio site should describe project as phases in pipeline
@@ -54,6 +53,7 @@
 		> Ingestion: AWS Lambda
 		> Distributed File System: S3 (S3 is actually an object store.. soooo?)
 		> Processing - Apache Spark.
+		> Loading - AWS Lambda
 		> Data Store: PostgresSQL
 		> Retrieval and visualization - Spring Boot + ChartJS running on AWS Elastic Beanstalk.
 
