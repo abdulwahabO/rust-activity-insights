@@ -19,6 +19,10 @@
         <logback.classic.version>1.2.3</logback.classic.version>
         <okhttp.version>4.9.0</okhttp.version>
         <aws.sdk.version>2.15.26</aws.sdk.version>
+        <apache.spark.version>3.0.1</apache.spark.version>
+        <palantir.spark.hadoop_cloud>3.0.0-palantir.86</palantir.spark.hadoop_cloud>
+        <aws.lambda.core.version>1.2.1</aws.lambda.core.version>
+        <aws.lambda.java.events.version>3.6.0</aws.lambda.java.events.version>
     </properties>
 
     <dependencyManagement>
@@ -55,6 +59,20 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- AWS Lambda Helpers -->
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-lambda-java-core</artifactId>
+                <version>${aws.lambda.core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-lambda-java-events</artifactId>
+                <version>${aws.lambda.java.events.version}</version>
+            </dependency>
+
             <!-- AWS Java SDK 2.0 -->
 
             <dependency>
@@ -68,6 +86,22 @@
                 <artifactId>dynamodb</artifactId>
                 <version>${aws.sdk.version}</version>
             </dependency>
+
+            <!-- Apache Spark -->
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_2.12</artifactId>
+                <version>${apache.spark.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-hadoop-cloud_2.12</artifactId>
+                <version>${palantir.spark.hadoop_cloud}</version>
+                <scope>provided</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -103,6 +137,16 @@
         <module>extractor-function</module>
         <module>spark-processor</module>
         <module>web-dashboard</module>
+        <module>loader-function</module>
     </modules>
+
+
+    <repositories>
+        <repository>
+            <id>palantir-repo</id>
+            <name>Palantir Repository</name>
+            <url>https://dl.bintray.com/palantir/releases/</url>
+        </repository>
+    </repositories>
 
 </project>
