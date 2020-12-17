@@ -2,12 +2,13 @@ package io.github.abdulwahabo.rai.processor;
 
 public class SparkProcessorDriver {
 
+    // todo
     private static final String S3_INPUT_FILE_PATH = "s3://";
-    private static final String S3_OUTPUT_FILE_PATH = "s3://";
+    private static final String DYNAMODB_TABLE = "s3";
 
     public static void main(String[] args) {
-        SparkProcessor processor = new SparkProcessor(S3_INPUT_FILE_PATH, S3_OUTPUT_FILE_PATH);
-        processor.start();
+        SparkProcessor processor = new SparkProcessor();
+        processor.start(S3_INPUT_FILE_PATH, DYNAMODB_TABLE);
     }
 
     // TODO: Write to an S3 file, for which a lambda function would be triggered:

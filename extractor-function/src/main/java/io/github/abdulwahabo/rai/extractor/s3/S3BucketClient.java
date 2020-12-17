@@ -15,7 +15,10 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 public class S3BucketClient {
 
     public void writeFile(File file, String key, String bucket) throws S3ClientException {
+
+        // todo: Move to private method after extracting common module.
         S3Client s3Client = S3Client.builder().region(Region.US_EAST_1).build();
+
         PutObjectRequest request = PutObjectRequest.builder()
                                                    .key(key)
                                                    .bucket(bucket)
@@ -31,6 +34,8 @@ public class S3BucketClient {
             throw new S3ClientException("Failed to write file", e);
         }
     }
+
+
 
     // TODO: Add a read method and move to common module.
 }
