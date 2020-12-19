@@ -1,48 +1,59 @@
 package io.github.abdulwahabo.rai.processor;
 
-import io.github.abdulwahabo.rai.processor.model.EventDataModel;
+import io.github.abdulwahabo.rai.processor.model.AggregateEventData;
+import io.github.abdulwahabo.rai.processor.model.EventData;
 
+import java.util.List;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.KeyValueGroupedDataset;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.TypedColumn;
+import scala.Tuple2;
 
 public class SparkProcessor {
 
-    private String inputFile;
-    private String outputFile;
-
-    SparkProcessor(String inputFile, String outputFile) {
-        this.inputFile = inputFile;
-        this.outputFile = outputFile;
-    }
-
-    void start() {
+    void start(String file, String dynamoTable) {
 
         SparkSession spark = SparkSession.builder().appName("RustLang Activity Insights").getOrCreate();
 
-        Encoder<EventDataModel> encoder = Encoders.bean(EventDataModel.class);
-        Dataset<EventDataModel> dataset = spark.read().json(inputFile).as(encoder);
+        Encoder<EventData> encoder = Encoders.bean(EventData.class);
+        Dataset<EventData> dataset = spark.read().json(file).as(encoder);
         dataset.cache();
 
-        // TODO: Open online docs for this class and study it's methods.
-        KeyValueGroupedDataset<String, EventDataModel> groupedDataset;
+        KeyValueGroupedDataset<String, EventData> groupedDataset =
+                dataset.groupByKey(eventKeyMapper, Encoders.STRING());
 
-        // TODO: Using UDFs to extract data
+        // TODO: Aggregate the dataSet using Aggregator interface.
 
-        // TODO: need to use a aggregator/transformation that takes an Encoder to create a new DataSet.
+        EventDataAggregator aggregator = new EventDataAggregator();
+        TypedColumn<EventData, List<AggregateEventData.RepositoryData>> column = aggregator.toColumn();
 
-        // Writing is a an actio
-        dataset.write().json("");
+        Encoder<AggregateEventData> aggregateEncoder = Encoders.bean(AggregateEventData.class);
 
-        // TODO: First things first, Group by date...
-        //          For each group, group by repository again
+        // TODO: Don't collect as list... write to S3 as JSON.
+        List<AggregateEventData> finalData = groupedDataset.agg(column)
+                                                           .map(aggregateEventMapper, aggregateEncoder)
+                                                           .collectAsList();
 
-        // TODO:::::: create new project module... loader-function
+        //
+        AggregateEventDataDao dataDao = new AggregateEventDataDao(dynamoTable);
 
-        // TODO: One way to avoid a Loader function:
-        //        Look into stateful transformations so that the Spark processor remembers the values ?????
+
+        // dataDao.save(finalData.get(0));
 
     }
+
+    // Needs to be declared explicitly to prevent ambiguity in call to Dataset#groupByKey()
+    private MapFunction<EventData, String> eventKeyMapper = EventData::getDate;
+
+    private MapFunction<Tuple2<String, List<AggregateEventData.RepositoryData>>, AggregateEventData>
+            aggregateEventMapper = (tuple) -> {
+
+
+        return new AggregateEventData();
+    };
+}
 }

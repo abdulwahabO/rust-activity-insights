@@ -87,6 +87,13 @@
                 <version>${aws.sdk.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>dynamodb-enhanced</artifactId>
+                <version>${aws.sdk.version}</version>
+            </dependency>
+
             <!-- Apache Spark -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
@@ -137,9 +144,7 @@
         <module>extractor-function</module>
         <module>spark-processor</module>
         <module>web-dashboard</module>
-        <module>loader-function</module>
     </modules>
-
 
     <repositories>
         <repository>
