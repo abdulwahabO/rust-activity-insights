@@ -41,9 +41,8 @@ public class SparkProcessor {
         //
         AggregateEventDataDao dataDao = new AggregateEventDataDao(dynamoTable);
 
-
-        // dataDao.save(finalData.get(0));
-
+        dataDao.save(finalData.get(0)); // TODO: catch and stop() the spark session
+        spark.stop();
     }
 
     // Needs to be declared explicitly to prevent ambiguity in call to Dataset#groupByKey()
@@ -55,5 +54,4 @@ public class SparkProcessor {
 
         return new AggregateEventData();
     };
-}
 }

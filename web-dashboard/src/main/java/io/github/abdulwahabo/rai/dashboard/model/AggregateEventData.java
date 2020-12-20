@@ -1,19 +1,12 @@
-package io.github.abdulwahabo.rai.processor.model;
-
+package io.github.abdulwahabo.rai.dashboard.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-
-// TODO: move to common module
-//       Annonate with DynamoDB specific classes.
-
-@DynamoDbBean
 public class AggregateEventData {
 
     private String date;
+
     private List<RepositoryData> repositoryData = new ArrayList<>();
 
     public List<RepositoryData> getRepositoryData() {
@@ -24,7 +17,6 @@ public class AggregateEventData {
         this.repositoryData = repositoryData;
     }
 
-    @DynamoDbPartitionKey
     public String getDate() {
         return date;
     }
@@ -33,7 +25,6 @@ public class AggregateEventData {
         this.date = date;
     }
 
-    @DynamoDbBean
     public static class RepositoryData {
 
         private String repository;

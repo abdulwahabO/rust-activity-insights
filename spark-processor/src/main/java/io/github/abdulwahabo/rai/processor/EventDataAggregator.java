@@ -2,8 +2,10 @@ package io.github.abdulwahabo.rai.processor;
 
 import io.github.abdulwahabo.rai.processor.model.AggregateEventData;
 import io.github.abdulwahabo.rai.processor.model.EventData;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
 public class EventDataAggregator extends
@@ -11,12 +13,12 @@ public class EventDataAggregator extends
 
     @Override
     public List<AggregateEventData.RepositoryData> zero() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public List<AggregateEventData.RepositoryData> reduce(
-            List<AggregateEventData.RepositoryData> b, EventData a) {
+            List<AggregateEventData.RepositoryData> repositoryData, EventData eventData) {
         return null;
     }
 
@@ -31,9 +33,13 @@ public class EventDataAggregator extends
         return null;
     }
 
+    // TODO: Problem:: Can't create Encoder for List type.
+    //      Solution: Create a wrapper type around List<Agg.RepoData> and use that type here.
+
     @Override
     public Encoder<List<AggregateEventData.RepositoryData>> bufferEncoder() {
-        return null;
+        Encoder<List<AggregateEventData.RepositoryData>> encoder =
+                Encoders.bean(List<AggregateEventData.RepositoryData>.class);
     }
 
     @Override

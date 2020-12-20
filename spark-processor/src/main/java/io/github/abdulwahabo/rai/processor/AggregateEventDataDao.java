@@ -1,19 +1,17 @@
 package io.github.abdulwahabo.rai.processor;
 
-import io.github.abdulwahabo.rai.processor.exception.DynamoDbExportException;
+import io.github.abdulwahabo.rai.processor.exception.DaoException;
 import io.github.abdulwahabo.rai.processor.model.AggregateEventData;
+
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
-import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
-// TODO: Move this class into Loader-function.
 public class AggregateEventDataDao {
-
-    // todo: Keep it simple... A method to send out the Data model out to the DB.
 
     private final String table;
 
@@ -21,27 +19,17 @@ public class AggregateEventDataDao {
         this.table = table;
     }
 
-    public void save(AggregateEventData data) throws DynamoDbExportException {
-
-        DynamoDbTable<AggregateEventData> table = dbTable();
-
-
-        // TODO: the Sdk supports the kind of Update i need to do..
-        //       NO need to manually cycle through date....
-        //       Read through docs extensively.
-
-        // TODO: write a loader-function that does two simple things..
-        //      1. Read the S3 and parse the JSON into objects.
-        //      2. Send the objects to DynamoDB... use update features provided by SDK..
-
-
+    public void save(AggregateEventData data) throws DaoException {
 
         try {
+            UpdateItemEnhancedRequest<AggregateEventData> request =
+                    UpdateItemEnhancedRequest.builder(AggregateEventData.class).item(data).build();
 
+            DynamoDbTable<AggregateEventData> table = dbTable();
+            table.updateItem(request);
         } catch (DynamoDbException e) {
-
+            throw new DaoException("Failed to write data to DynamoDB table", e);
         }
-
     }
 
     private DynamoDbTable<AggregateEventData> dbTable() {
@@ -56,5 +44,4 @@ public class AggregateEventDataDao {
 
         return dbEnhancedClient.table(table, TableSchema.fromBean(AggregateEventData.class));
     }
-
 }
