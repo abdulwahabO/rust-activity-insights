@@ -1,5 +1,6 @@
 package io.github.abdulwahabo.rai.processor;
 
+import io.github.abdulwahabo.rai.processor.exception.DaoException;
 import io.github.abdulwahabo.rai.processor.model.AggregateEventData;
 import io.github.abdulwahabo.rai.processor.model.EventData;
 
@@ -15,43 +16,51 @@ import scala.Tuple2;
 
 public class SparkProcessor {
 
-    void start(String file, String dynamoTable) {
+    private AggregateEventDataDaoImpl dataDao;
+    private String file;
+    private SparkSession sparkSession;
 
-        SparkSession spark = SparkSession.builder().appName("RustLang Activity Insights").getOrCreate();
-
-        Encoder<EventData> encoder = Encoders.bean(EventData.class);
-        Dataset<EventData> dataset = spark.read().json(file).as(encoder);
-        dataset.cache();
-
-        KeyValueGroupedDataset<String, EventData> groupedDataset =
-                dataset.groupByKey(eventKeyMapper, Encoders.STRING());
-
-        // TODO: Aggregate the dataSet using Aggregator interface.
-
-        EventDataAggregator aggregator = new EventDataAggregator();
-        TypedColumn<EventData, List<AggregateEventData.RepositoryData>> column = aggregator.toColumn();
-
-        Encoder<AggregateEventData> aggregateEncoder = Encoders.bean(AggregateEventData.class);
-
-        // TODO: Don't collect as list... write to S3 as JSON.
-        List<AggregateEventData> finalData = groupedDataset.agg(column)
-                                                           .map(aggregateEventMapper, aggregateEncoder)
-                                                           .collectAsList();
-
-        //
-        AggregateEventDataDao dataDao = new AggregateEventDataDao(dynamoTable);
-
-        dataDao.save(finalData.get(0)); // TODO: catch and stop() the spark session
-        spark.stop();
+    public SparkProcessor(AggregateEventDataDaoImpl dataDao, String file, SparkSession sparkSession) {
+        this.dataDao = dataDao;
+        this.file = file;
+        this.sparkSession = sparkSession;
     }
 
-    // Needs to be declared explicitly to prevent ambiguity in call to Dataset#groupByKey()
+    void start() throws DaoException {
+
+       // SparkSession spark = SparkSession.builder().appName("RustLang Activity Insights").getOrCreate();
+
+        Encoder<EventData> encoder = Encoders.bean(EventData.class);
+        Dataset<EventData> dataset = sparkSession.read().json(file).as(encoder);
+        dataset.cache();
+
+        KeyValueGroupedDataset<String, EventData> groupedDataset = dataset.groupByKey(eventKeyMapper, Encoders.STRING());
+
+        EventDataAggregator aggregator = new EventDataAggregator();
+        TypedColumn<EventData, AggregateEventData.RepositoryDataWrapper> column = aggregator.toColumn();
+        Encoder<AggregateEventData> aggregateEncoder = Encoders.bean(AggregateEventData.class);
+
+        Dataset<Tuple2<String, AggregateEventData.RepositoryDataWrapper>> tuple2Dataset = groupedDataset.agg(column);
+        Dataset<AggregateEventData> aggregateEventDataDataset = tuple2Dataset.map(aggregateMapper, aggregateEncoder);
+        List<AggregateEventData> finalData = aggregateEventDataDataset.collectAsList();
+
+
+        dataDao.save(finalData);
+       // spark.stop();
+    }
+
+    // Declared explicitly to prevent ambiguity in call to Dataset#groupByKey()
     private MapFunction<EventData, String> eventKeyMapper = EventData::getDate;
 
-    private MapFunction<Tuple2<String, List<AggregateEventData.RepositoryData>>, AggregateEventData>
-            aggregateEventMapper = (tuple) -> {
+    private MapFunction<Tuple2<String, AggregateEventData.RepositoryDataWrapper>, AggregateEventData>
+            aggregateMapper = (tuple) -> {
 
+        AggregateEventData result = new AggregateEventData();
+        result.setDate(tuple._1);
 
-        return new AggregateEventData();
+        List<AggregateEventData.RepositoryData> repositoryData = tuple._2.getRepositoryDataList();
+        result.setRepositoryData(repositoryData);
+
+        return result;
     };
 }
