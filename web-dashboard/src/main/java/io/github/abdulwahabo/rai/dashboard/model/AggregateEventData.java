@@ -1,12 +1,16 @@
 package io.github.abdulwahabo.rai.dashboard.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+
+@DynamoDbBean
 public class AggregateEventData {
 
     private String date;
-
     private List<RepositoryData> repositoryData = new ArrayList<>();
 
     public List<RepositoryData> getRepositoryData() {
@@ -17,6 +21,7 @@ public class AggregateEventData {
         this.repositoryData = repositoryData;
     }
 
+    @DynamoDbPartitionKey
     public String getDate() {
         return date;
     }
@@ -25,14 +30,17 @@ public class AggregateEventData {
         this.date = date;
     }
 
+    @DynamoDbBean
     public static class RepositoryData {
 
         private String repository;
-        private int issues;
+        private int forks;
         private int watcher;
         private int branches;
-        private int commits;
-        private int pullRequests;
+        private int pushes;
+
+        @JsonProperty("pr_review_comments")
+        private int pullRequestReviewComments;
 
         public int getWatcher() {
             return watcher;
@@ -53,29 +61,29 @@ public class AggregateEventData {
             this.repository = repository;
         }
 
-        public int getPullRequests() {
+        public int getPullRequestReviewComments() {
 
-            return pullRequests;
+            return pullRequestReviewComments;
         }
 
-        public void setPullRequests(int pullRequests) {
-            this.pullRequests = pullRequests;
+        public void setPullRequestReviewComments(int pullRequestReviewComments) {
+            this.pullRequestReviewComments = pullRequestReviewComments;
         }
 
-        public int getIssues() {
-            return issues;
+        public int getForks() {
+            return forks;
         }
 
-        public void setIssues(int issues) {
-            this.issues = issues;
+        public void setForks(int forks) {
+            this.forks = forks;
         }
 
-        public int getCommits() {
-            return commits;
+        public int getPushes() {
+            return pushes;
         }
 
-        public void setCommits(int commits) {
-            this.commits = commits;
+        public void setPushes(int pushes) {
+            this.pushes = pushes;
         }
 
         public int getBranches() {
@@ -86,5 +94,4 @@ public class AggregateEventData {
             this.branches = branches;
         }
     }
-
 }

@@ -1,9 +1,11 @@
 package io.github.abdulwahabo.rai.dashboard.web;
 
 import io.github.abdulwahabo.rai.dashboard.service.DashboardService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,7 +30,6 @@ public class DashboardController {
     public void data(@RequestParam("from_date") String from, @RequestParam("to_date") String to) {
 
     }
-
 
     // TODO: reuse error pages from Filebox.
 

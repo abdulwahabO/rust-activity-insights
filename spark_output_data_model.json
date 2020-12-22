@@ -1,48 +1,42 @@
-
 [
     {
         "date": "2020-10-11",
-        "repos": {
-            "repo_1": {
-                "new_issues": 32,
+        "repos": [
+            {   "repository": "repo_1",
+                "new_forks": 32,
                 "new_watchers": 35,
                 "new_branches": 4,
-                "total_events": 84,
-                "new_PRs": 12,
-                "new_commits": 32
+                "new_PR_comments": 12,
+                "new_pushes": 32
             },
-            "repo_2": {
-                "new_issues": 12,
+            {
+                "repository": "repo_2",
+                "new_forks": 12,
                 "new_watchers": 15,
                 "new_branches": 41,
-                "total_events": 34,
-                "new_PRs": 22,
-                "new_commits": 122
+                "new_PR_comments": 22,
+                "new_pushes": 122
             }
-        }
+        ]
     },
-
     {
-        "date": "2020-11-11",
-        "repos": {
-            "repo_1": {
-                "new_issues": 32,
-                "new_watchers": 35,
+        "date": "2020-09-031",
+        "repos": [
+            {   "repository": "repo_1",
+                "new_forks": 32,
+                "new_watchers": 65,
                 "new_branches": 4,
-                "total_events": 84,
-                "new_PRs": 12,
-                "new_commits": 32
+                "new_PR_comments": 12,
+                "new_pushes": 32
             },
-            "repo_2": {
-                "new_issues": 12,
+            {
+                "repository": "repo_2",
+                "new_forks": 12,
                 "new_watchers": 15,
                 "new_branches": 41,
-                "total_events": 34,
-                "new_PRs": 22,
-                "new_commits": 122
+                "new_PR_comments": 22,
+                "new_pushes": 122
             }
-        }
+        ]
     }
 ]
-
-

@@ -16,19 +16,17 @@ import scala.Tuple2;
 
 public class SparkProcessor {
 
-    private AggregateEventDataDaoImpl dataDao;
+    private AggregateEventDataDao dataDao;
     private String file;
     private SparkSession sparkSession;
 
-    public SparkProcessor(AggregateEventDataDaoImpl dataDao, String file, SparkSession sparkSession) {
+    public SparkProcessor(AggregateEventDataDao dataDao, String file, SparkSession sparkSession) {
         this.dataDao = dataDao;
         this.file = file;
         this.sparkSession = sparkSession;
     }
 
     void start() throws DaoException {
-
-       // SparkSession spark = SparkSession.builder().appName("RustLang Activity Insights").getOrCreate();
 
         Encoder<EventData> encoder = Encoders.bean(EventData.class);
         Dataset<EventData> dataset = sparkSession.read().json(file).as(encoder);
@@ -44,9 +42,7 @@ public class SparkProcessor {
         Dataset<AggregateEventData> aggregateEventDataDataset = tuple2Dataset.map(aggregateMapper, aggregateEncoder);
         List<AggregateEventData> finalData = aggregateEventDataDataset.collectAsList();
 
-
         dataDao.save(finalData);
-       // spark.stop();
     }
 
     // Declared explicitly to prevent ambiguity in call to Dataset#groupByKey()
