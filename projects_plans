@@ -50,7 +50,8 @@
 		> Distributed File System: S3 (S3 is actually an object store.. soooo?)
 		> Processing - Apache Spark.
 		> Data Store: AWS DynamoDB.
-		> Retrieval and visualization - Spring Boot + ChartJS running on AWS Elastic Beanstalk.
+		> Visualization - Spring Boot + ChartJS running on AWS Elastic Beanstalk.
+		> Pipeline orchestration: AWS Step Functions or Apache Airflow (AWS Managed Airflow)
 
 >>> Things to figure out how to do correctly:
 		

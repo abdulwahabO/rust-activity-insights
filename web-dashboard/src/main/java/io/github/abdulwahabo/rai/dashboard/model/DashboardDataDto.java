@@ -13,7 +13,8 @@ public class DashboardDataDto {
 
     // todo: use for for doughnut pie chart.
     @JsonProperty("activities_percentage")
-    private Map<String, Double> activitiesPercentage; // todo: percentages of each activity for period.
+    private Map<String, Double> activitiesPercentage;
+    // todo: percentages of each activity for period.
 
     // todo: Table.
     @JsonProperty("repos_activities_total")

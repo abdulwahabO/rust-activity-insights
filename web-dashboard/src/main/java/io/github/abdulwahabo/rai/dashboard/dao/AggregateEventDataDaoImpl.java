@@ -4,12 +4,16 @@ import io.github.abdulwahabo.rai.dashboard.model.AggregateEventData;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -21,11 +25,11 @@ public class AggregateEventDataDaoImpl implements AggregateEventDataDao {
 
     @Override
     public Optional<List<AggregateEventData>> get(String startDate, String endDate) {
-
-
-
-
-        return Optional.empty();
+        Key start = Key.builder().partitionValue(startDate).build();
+        Key end = Key.builder().partitionValue(endDate).build();
+        QueryConditional conditional = QueryConditional.sortBetween(start, end);
+        List<AggregateEventData> data = dbTable().query(conditional).items().stream().collect(Collectors.toList());
+        return Optional.of(data);
     }
 
     private DynamoDbTable<AggregateEventData> dbTable() {
