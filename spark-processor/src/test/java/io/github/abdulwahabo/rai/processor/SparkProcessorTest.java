@@ -1,9 +1,0 @@
-package io.github.abdulwahabo.rai.processor;
-
-public class SparkProcessorTest {
-
-    // TODO: Create a file with sample data and pass it to processor...
-    // TODO: Then use ObjectMapper to parse the output file...
-
-    // TODO: Read docs section on testing, might need to start spark engine in test somehow...
-}

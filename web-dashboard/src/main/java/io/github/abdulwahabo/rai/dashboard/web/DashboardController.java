@@ -36,6 +36,7 @@ public class DashboardController {
         String start = LocalDate.now().minusDays(10).toString();
         String end = LocalDate.now().toString();
         DashboardDataDto dashboardDataDto = dashboardService.getData(start, end);
+        modelMap.addAttribute("dto", dashboardDataDto);
         return new ModelAndView("dashboard", modelMap);
     }
 }

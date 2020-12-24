@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// TODO: use orchestration tool for this project.
-//      Benefits: if Spark job errors for example, another extractor job won't overwrite unprocessed raw data.
-
 @Service
 public class DashboardService {
 
@@ -98,8 +95,6 @@ public class DashboardService {
         percentPerActivity.put("watchers", percentageOfTotal(totalNewActivity, totalWatchers));
         return percentPerActivity;
     }
-
-
 
     // Calculates the percentage of 'value' in 'total'
     private double percentageOfTotal(double total, double value) {

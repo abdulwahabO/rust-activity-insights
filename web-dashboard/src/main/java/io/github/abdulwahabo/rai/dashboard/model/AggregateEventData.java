@@ -1,6 +1,7 @@
 package io.github.abdulwahabo.rai.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
