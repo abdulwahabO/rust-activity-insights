@@ -2,9 +2,11 @@
 
 Still WIP.
 
--- use spark_submit script.
+-- use spark_submit script to launch locally.
 
-## Planed Improvements
+## Planned Improvement: Pipeline Orchestration
 
         - K8s cluster.
         - Pipeline orchestration
+
+## Planned Improvement: Kubernetes Cluster

@@ -1,7 +1,5 @@
 package io.github.abdulwahabo.rai.dashboard.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +37,7 @@ public class AggregateEventData {
         private int watcher;
         private int branches;
         private int pushes;
-
-        @JsonProperty("pr_review_comments")
-        private int pullRequestReviewComments;
+        private int comments;
 
         public int getWatcher() {
             return watcher;
@@ -62,13 +58,16 @@ public class AggregateEventData {
             this.repository = repository;
         }
 
-        public int getPullRequestReviewComments() {
-
-            return pullRequestReviewComments;
+        /**
+         *  todo: this is PR review comments.
+         * @return
+         */
+        public int getComments() {
+            return comments;
         }
 
-        public void setPullRequestReviewComments(int pullRequestReviewComments) {
-            this.pullRequestReviewComments = pullRequestReviewComments;
+        public void setComments(int comments) {
+            this.comments = comments;
         }
 
         public int getForks() {

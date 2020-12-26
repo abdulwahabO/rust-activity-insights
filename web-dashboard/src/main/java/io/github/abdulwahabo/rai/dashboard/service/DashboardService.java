@@ -35,28 +35,29 @@ public class DashboardService {
             List<AggregateEventData> aggregateEventData = optionalList.get();
 
             for (AggregateEventData eventData : aggregateEventData) {
-                List<AggregateEventData.RepositoryData> repositoryData = eventData.getRepositoryData();
-                for (AggregateEventData.RepositoryData data : repositoryData) {
-                    repositoryDataMap.putIfAbsent(data.getRepository(), data);
-                    repositoryDataMap.computeIfPresent(data.getRepository(), (key, value) -> {
-                        value.setBranches(value.getBranches() + data.getBranches());
-                        value.setForks(value.getForks() + data.getForks());
-                        value.setPushes(value.getPushes() + data.getPushes());
-                        value.setWatcher(value.getWatcher() + data.getWatcher());
-                        value.setPullRequestReviewComments(
-                                value.getPullRequestReviewComments() + data.getPullRequestReviewComments());
-                        return value;
-                    });
+                List<AggregateEventData.RepositoryData> repositoryDataList = eventData.getRepositoryData();
+                for (AggregateEventData.RepositoryData data : repositoryDataList) {
+
+                    if (repositoryDataMap.containsKey(data.getRepository())) {
+                        AggregateEventData.RepositoryData oldValue = repositoryDataMap.get(data.getRepository());
+                        oldValue.setBranches(oldValue.getBranches() + data.getBranches());
+                        oldValue.setForks(oldValue.getForks() + data.getForks());
+                        oldValue.setPushes(oldValue.getPushes() + data.getPushes());
+                        oldValue.setWatcher(oldValue.getWatcher() + data.getWatcher());
+                        oldValue.setComments(oldValue.getComments() + data.getComments());
+                    } else {
+                        repositoryDataMap.put(data.getRepository(), data);
+                    }
                 }
             }
             List<AggregateEventData.RepositoryData> repositoryData = new ArrayList<>(repositoryDataMap.values());
             DashboardDataDto dashboardDataDto = new DashboardDataDto();
             dashboardDataDto.setRepositoryActivityTotal(repositoryData);
+
             Map<String, Integer> topPushes = topPushes(repositoryData);
             dashboardDataDto.setPushesPerRepo(topPushes);
             Map<String, Double> percentPerActivity = percentPerActivity(repositoryData);
             dashboardDataDto.setActivitiesPercentage(percentPerActivity);
-
             return dashboardDataDto;
         } else {
             return new DashboardDataDto();
@@ -82,7 +83,7 @@ public class DashboardService {
         int totalWatchers = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getWatcher).sum();
         int totalPRreviewComments = repositoryData.stream()
                                                   .mapToInt(
-                                                          AggregateEventData.RepositoryData::getPullRequestReviewComments)
+                                                          AggregateEventData.RepositoryData::getComments)
                                                   .sum();
 
         int totalNewActivity = totalBranches + totalForks + totalPRreviewComments + totalWatchers + totalPushes;
@@ -91,7 +92,7 @@ public class DashboardService {
         percentPerActivity.put("pushes", percentageOfTotal(totalNewActivity, totalPushes));
         percentPerActivity.put("forks", percentageOfTotal(totalNewActivity, totalForks));
         percentPerActivity.put("branches", percentageOfTotal(totalNewActivity, totalBranches));
-        percentPerActivity.put("pr_comments", percentageOfTotal(totalNewActivity, totalPRreviewComments));
+        percentPerActivity.put("comments", percentageOfTotal(totalNewActivity, totalPRreviewComments));
         percentPerActivity.put("watchers", percentageOfTotal(totalNewActivity, totalWatchers));
         return percentPerActivity;
     }
