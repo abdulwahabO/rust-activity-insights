@@ -9,19 +9,14 @@ import io.github.abdulwahabo.rai.extractor.github.GithubHttpClient;
 import io.github.abdulwahabo.rai.extractor.s3.S3BucketClient;
 
 // This is the entry point used by the AWS Lambda Function.
-public class LambdaFunction implements RequestHandler<CloudWatchLogsEvent, Void> {
-
-    // TODO: goto lambda config and increase the running time..
-
-    private final Extractor extractor =
-            new Extractor(new S3BucketClient(), new GithubHttpClient(), new ExtractorUtil());
-
+public class LambdaFunction implements RequestHandler<CloudWatchLogsEvent, String> {
+    private Extractor extractor = new Extractor(new S3BucketClient(), new GithubHttpClient(), new ExtractorUtil());
     @Override
-    public Void handleRequest(CloudWatchLogsEvent input, Context context) {
+    public String handleRequest(CloudWatchLogsEvent input, Context context) {
         LambdaLogger logger = context.getLogger();
         logger.log("AWS Request ID:" + context.getAwsRequestId());
         extractor.extract();
         logger.log("Finished run with " + context.getRemainingTimeInMillis() + " milliseconds left");
-        return null;
+        return "OK";
     }
 }

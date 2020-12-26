@@ -2,7 +2,11 @@
 
 Still WIP.
 
-Issues: Data for a date is overwritten cus no update.
-        AWS SDk 2 is immature currently, so I don't know what update item does.
+-- use spark_submit script to launch locally.
 
-NOte: don't describe how to deploy locally, just describe AWS setup and Architecture.
+## Planned Improvement: Pipeline Orchestration
+
+        - K8s cluster.
+        - Pipeline orchestration
+
+## Planned Improvement: Kubernetes Cluster
