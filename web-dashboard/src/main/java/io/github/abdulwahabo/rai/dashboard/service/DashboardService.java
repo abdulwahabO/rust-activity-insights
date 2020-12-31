@@ -52,7 +52,6 @@ public class DashboardService {
             }
             List<AggregateEventData.RepositoryData> repositoryData = new ArrayList<>(repositoryDataMap.values());
             DashboardDataDto dashboardDataDto = new DashboardDataDto();
-            dashboardDataDto.setRepositoryActivityTotal(repositoryData);
 
             Map<String, Integer> topPushes = topPushes(repositoryData);
             dashboardDataDto.setPushesPerRepo(topPushes);

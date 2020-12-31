@@ -7,11 +7,54 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.css">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-    <title>Insights</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <title>Data Insights</title>
 </head>
 
 <body>
+    <input type="hidden" id="api" th:value="${api_url}">
+    <nav class="navbar is-light" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <h2>Rustlang Github Activity Insights</h2>
+        </div>
+    
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <!-- Empty left-hand side of navbar -->
+            </div>
+    
+            <div class="navbar-end">
+                <p class="navbar-item" th:text="${user.name}"></p>
+                <div class="navbar-item">
+                    <!-- This has to contain the input for the dropdown -->
 
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="columns is-centered">
+        <div class="column is-10">
+            <p> 
+                <!-- TODO: In here explain what's up with the charts. -->
+            </p>
+        </div>
+    </div>
+
+    <div class="columns is-centered">
+        <div class="column is-6">
+            <canvas id="bar_chart"></canvas>
+        </div>
+
+        <div class="column is-6">
+            <canvas id="doughnut_chart"></canvas>
+        </div>
+    </div>
 
 <script>
 

@@ -16,18 +16,6 @@ public class DashboardDataDto {
     private Map<String, Double> activitiesPercentage;
     // todo: percentages of each activity for period.
 
-    // todo: Table.
-    @JsonProperty("repos_activities_total")
-    private List<AggregateEventData.RepositoryData> repositoryActivityTotal;
-
-    public List<AggregateEventData.RepositoryData> getRepositoryActivityTotal() {
-        return new ArrayList<>(repositoryActivityTotal);
-    }
-
-    public void setRepositoryActivityTotal(List<AggregateEventData.RepositoryData> repositoryActivityTotal) {
-        this.repositoryActivityTotal = repositoryActivityTotal;
-    }
-
     public Map<String, Integer> getPushesPerRepo() {
         return pushesPerRepo;
     }
