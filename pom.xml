@@ -106,7 +106,6 @@
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-hadoop-cloud_2.12</artifactId>
                 <version>${palantir.spark.hadoop_cloud}</version>
-                <scope>provided</scope>
             </dependency>
 
         </dependencies>

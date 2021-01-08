@@ -3,6 +3,7 @@ package io.github.abdulwahabo.rai.processor;
 import io.github.abdulwahabo.rai.processor.model.AggregateEventData;
 import io.github.abdulwahabo.rai.processor.model.EventData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,14 +23,12 @@ public class EventDataAggregator extends
     public AggregateEventData.RepositoryDataWrapper reduce(
             AggregateEventData.RepositoryDataWrapper buffer,
             EventData eventData) {
-
-        List<AggregateEventData.RepositoryData> repositoryDataList = buffer.getRepositoryDataList();
-
+        List<AggregateEventData.RepositoryData> oldBufferList = buffer.getRepositoryDataList();
         Optional<AggregateEventData.RepositoryData> dataOptional =
-                repositoryDataList.stream()
+                oldBufferList.stream()
                                   .filter(repositoryData -> repositoryData.getRepository()
-                                                                          .equals(eventData.getRepository()))
-                                  .findAny();
+                                                                          .equalsIgnoreCase(eventData.getRepository()))
+                                  .findFirst();
 
         AggregateEventData.RepositoryData repositoryData =
                 dataOptional.orElseGet(() -> {
@@ -57,7 +56,9 @@ public class EventDataAggregator extends
                 repositoryData.setIssuesEvents(repositoryData.getIssuesEvents() + 1);
                 break;
         }
-        buffer.setRepositoryDataList(repositoryDataList);
+        oldBufferList.removeIf(oldEntry -> oldEntry.getRepository().equalsIgnoreCase(repositoryData.getRepository()));
+        oldBufferList.add(repositoryData);
+        buffer.setRepositoryDataList(oldBufferList);
         return buffer;
     }
 
@@ -68,23 +69,32 @@ public class EventDataAggregator extends
 
         List<AggregateEventData.RepositoryData> repositoryDataList1 = b1.getRepositoryDataList();
         List<AggregateEventData.RepositoryData> repositoryDataList2 = b2.getRepositoryDataList();
+        List<AggregateEventData.RepositoryData> resultList = new ArrayList<>();
+        AggregateEventData.RepositoryDataWrapper result = new AggregateEventData.RepositoryDataWrapper();
 
-        for (AggregateEventData.RepositoryData repositoryData1 : repositoryDataList1) {
-            for (AggregateEventData.RepositoryData repositoryData2 : repositoryDataList2) {
-                if (repositoryData1.getRepository().equalsIgnoreCase(repositoryData2.getRepository())) {
-
-                    repositoryData1.setIssuesEvents(repositoryData1.getIssuesEvents() + repositoryData2.getIssuesEvents());
-                    repositoryData1.setPushes(repositoryData1.getPushes() + repositoryData2.getPushes());
-                    repositoryData1.setBranches(repositoryData1.getBranches() + repositoryData2.getBranches());
-                    repositoryData1.setWatcher(repositoryData1.getWatcher() + repositoryData2.getWatcher());
-                    repositoryData1.setPullRequestEvents(repositoryData1.getPullRequestEvents()
-                            + repositoryData2.getPullRequestEvents());
-                    break;
+        if (repositoryDataList1.size() > 0 && repositoryDataList2.size() <= 0) {
+          return b1;
+        } else if (repositoryDataList2.size() > 0 && repositoryDataList1.size() <= 0) {
+            return b2;
+        } else {
+            for (AggregateEventData.RepositoryData repositoryData1 : repositoryDataList1) {
+                for (AggregateEventData.RepositoryData repositoryData2 : repositoryDataList2) {
+                    if (repositoryData1.getRepository().equalsIgnoreCase(repositoryData2.getRepository())) {
+                        AggregateEventData.RepositoryData newData = new AggregateEventData.RepositoryData();
+                        newData.setIssuesEvents(repositoryData1.getIssuesEvents() + repositoryData2.getIssuesEvents());
+                        newData.setPushes(repositoryData1.getPushes() + repositoryData2.getPushes());
+                        newData.setBranches(repositoryData1.getBranches() + repositoryData2.getBranches());
+                        newData.setWatcher(repositoryData1.getWatcher() + repositoryData2.getWatcher());
+                        newData.setPullRequestEvents(repositoryData1.getPullRequestEvents()
+                                + repositoryData2.getPullRequestEvents());
+                        resultList.add(newData);
+                        break;
+                    }
                 }
             }
         }
-        b1.setRepositoryDataList(repositoryDataList1);
-        return b1;
+        result.setRepositoryDataList(resultList);
+        return result;
     }
 
     @Override

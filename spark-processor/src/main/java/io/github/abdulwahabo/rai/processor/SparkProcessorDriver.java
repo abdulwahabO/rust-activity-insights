@@ -5,7 +5,7 @@ import org.apache.spark.sql.SparkSession;
 
 public class SparkProcessorDriver {
 
-    private static final String S3_FILE_PATH = "s3://filebox-storage/rust_activities_data";
+    private static final String S3_FILE_PATH = "s3a://filebox-storage/rust_activities_data";
     private static final String DYNAMODB_TABLE = "rust-event-data";
 
     public static void main(String[] args) {
