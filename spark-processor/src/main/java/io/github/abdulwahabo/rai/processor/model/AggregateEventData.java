@@ -47,11 +47,11 @@ public class AggregateEventData {
     public static class RepositoryData {
 
         private String repository;
-        private int forks;
+        private int issuesEvents; // All issues events.
         private int watcher;
         private int branches;
         private int pushes;
-        private int pullRequestReviewComments;
+        private int pullRequestEvents; // All PR events.
 
         public int getWatcher() {
             return watcher;
@@ -72,21 +72,21 @@ public class AggregateEventData {
             this.repository = repository;
         }
 
-        public int getPullRequestReviewComments() {
+        public int getPullRequestEvents() {
 
-            return pullRequestReviewComments;
+            return pullRequestEvents;
         }
 
-        public void setPullRequestReviewComments(int pullRequestReviewComments) {
-            this.pullRequestReviewComments = pullRequestReviewComments;
+        public void setPullRequestEvents(int pullRequestEvents) {
+            this.pullRequestEvents = pullRequestEvents;
         }
 
-        public int getForks() {
-            return forks;
+        public int getIssuesEvents() {
+            return issuesEvents;
         }
 
-        public void setForks(int forks) {
-            this.forks = forks;
+        public void setIssuesEvents(int issuesEvents) {
+            this.issuesEvents = issuesEvents;
         }
 
         public int getPushes() {
@@ -105,5 +105,4 @@ public class AggregateEventData {
             this.branches = branches;
         }
     }
-
 }

@@ -3,9 +3,8 @@ package io.github.abdulwahabo.rai.dashboard.web;
 import io.github.abdulwahabo.rai.dashboard.model.DashboardDataDto;
 import io.github.abdulwahabo.rai.dashboard.service.DashboardService;
 
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,6 +17,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class DashboardController {
 
     private DashboardService dashboardService;
+
+    @Value("${TODO}") // todo: make sure host ends without slash.
+    private String host;
 
     @Autowired
     public DashboardController(DashboardService dashboardService) {
@@ -33,10 +35,7 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public ModelAndView dashboard(ModelMap modelMap) {
-        String start = LocalDate.now().minusDays(10).toString();
-        String end = LocalDate.now().toString();
-        DashboardDataDto dashboardDataDto = dashboardService.getData(start, end);
-        modelMap.addAttribute("dto", dashboardDataDto);
-        return new ModelAndView("dashboard", modelMap);
+        modelMap.addAttribute("api_url", host.concat("/data"));
+        return new ModelAndView("dashboard");
     }
 }

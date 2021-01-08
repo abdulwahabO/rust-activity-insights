@@ -14,8 +14,6 @@ public class GithubEventDto {
     @JsonProperty("created_at")
     private String time;
 
-    // TODO: Read the Github API overview to know format for time.
-
     public String getType() {
         return type;
     }
@@ -56,6 +54,7 @@ public class GithubEventDto {
         this.actor = actor;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class User {
 
         private String id;
@@ -78,6 +77,7 @@ public class GithubEventDto {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Repository {
 
         private String name;

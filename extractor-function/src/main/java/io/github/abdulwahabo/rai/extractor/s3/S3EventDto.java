@@ -1,21 +1,10 @@
 package io.github.abdulwahabo.rai.extractor.s3;
 
-
-// Rename to EventDto and move to common.
 public class S3EventDto {
 
     private String type;
-    private String userId;
     private String repository;
     private String date;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public String getType() {
         return type;
