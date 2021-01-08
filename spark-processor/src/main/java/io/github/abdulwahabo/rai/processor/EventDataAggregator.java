@@ -5,6 +5,7 @@ import io.github.abdulwahabo.rai.processor.model.EventData;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
@@ -48,13 +49,14 @@ public class EventDataAggregator extends
                 repositoryData.setPushes(repositoryData.getPushes() + 1);
                 break;
             case "PullRequestReviewCommentEvent":
-                repositoryData.setPullRequestReviewComments(repositoryData.getPullRequestReviewComments() + 1);
+            case "PullRequestEvent":
+                repositoryData.setPullRequestEvents(repositoryData.getPullRequestEvents() + 1);
                 break;
-            case "ForkEvent":
-                repositoryData.setForks(repositoryData.getForks() + 1);
+            case "IssueCommentEvent":
+            case "IssuesEvent":
+                repositoryData.setIssuesEvents(repositoryData.getIssuesEvents() + 1);
                 break;
         }
-
         buffer.setRepositoryDataList(repositoryDataList);
         return buffer;
     }
@@ -71,17 +73,16 @@ public class EventDataAggregator extends
             for (AggregateEventData.RepositoryData repositoryData2 : repositoryDataList2) {
                 if (repositoryData1.getRepository().equalsIgnoreCase(repositoryData2.getRepository())) {
 
-                    repositoryData1.setForks(repositoryData1.getForks() + repositoryData2.getForks());
+                    repositoryData1.setIssuesEvents(repositoryData1.getIssuesEvents() + repositoryData2.getIssuesEvents());
                     repositoryData1.setPushes(repositoryData1.getPushes() + repositoryData2.getPushes());
                     repositoryData1.setBranches(repositoryData1.getBranches() + repositoryData2.getBranches());
                     repositoryData1.setWatcher(repositoryData1.getWatcher() + repositoryData2.getWatcher());
-                    repositoryData1.setPullRequestReviewComments(repositoryData1.getPullRequestReviewComments()
-                            + repositoryData2.getPullRequestReviewComments());
+                    repositoryData1.setPullRequestEvents(repositoryData1.getPullRequestEvents()
+                            + repositoryData2.getPullRequestEvents());
                     break;
                 }
             }
         }
-
         b1.setRepositoryDataList(repositoryDataList1);
         return b1;
     }

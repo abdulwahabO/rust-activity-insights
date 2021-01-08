@@ -41,10 +41,10 @@ public class DashboardService {
                     if (repositoryDataMap.containsKey(data.getRepository())) {
                         AggregateEventData.RepositoryData oldValue = repositoryDataMap.get(data.getRepository());
                         oldValue.setBranches(oldValue.getBranches() + data.getBranches());
-                        oldValue.setForks(oldValue.getForks() + data.getForks());
+                        oldValue.setIssuesEvents(oldValue.getIssuesEvents() + data.getIssuesEvents());
                         oldValue.setPushes(oldValue.getPushes() + data.getPushes());
                         oldValue.setWatcher(oldValue.getWatcher() + data.getWatcher());
-                        oldValue.setComments(oldValue.getComments() + data.getComments());
+                        oldValue.setPullRequestEvents(oldValue.getPullRequestEvents() + data.getPullRequestEvents());
                     } else {
                         repositoryDataMap.put(data.getRepository(), data);
                     }
@@ -53,8 +53,8 @@ public class DashboardService {
             List<AggregateEventData.RepositoryData> repositoryData = new ArrayList<>(repositoryDataMap.values());
             DashboardDataDto dashboardDataDto = new DashboardDataDto();
 
-            Map<String, Integer> topPushes = topPushes(repositoryData);
-            dashboardDataDto.setPushesPerRepo(topPushes);
+            Map<String, Integer> topIssuesActivity = topIssuesActivity(repositoryData);
+            dashboardDataDto.setTopIssuesActivity(topIssuesActivity);
             Map<String, Double> percentPerActivity = percentPerActivity(repositoryData);
             dashboardDataDto.setActivitiesPercentage(percentPerActivity);
             return dashboardDataDto;
@@ -64,34 +64,33 @@ public class DashboardService {
     }
 
     // TODO: Explain what this does....
-    private Map<String, Integer> topPushes(List<AggregateEventData.RepositoryData> repositoryData) {
-
-        repositoryData.sort(Comparator.comparingInt(AggregateEventData.RepositoryData::getPushes));
+    private Map<String, Integer> topIssuesActivity(List<AggregateEventData.RepositoryData> repositoryData) {
+        repositoryData.sort(Comparator.comparingInt(AggregateEventData.RepositoryData::getIssuesEvents));
         return repositoryData.stream()
                              .limit(5)
                              .collect(Collectors.toMap(AggregateEventData.RepositoryData::getRepository,
-                                     AggregateEventData.RepositoryData::getPushes));
+                                     AggregateEventData.RepositoryData::getIssuesEvents));
     }
 
-    // TODO: explain what this does..,..
+    // TODO: Explain what this does..,..
     private Map<String, Double> percentPerActivity(List<AggregateEventData.RepositoryData> repositoryData) {
 
         int totalPushes = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getPushes).sum();
-        int totalForks = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getForks).sum();
+        int totalIssuesActivity = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getIssuesEvents).sum();
         int totalBranches = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getBranches).sum();
         int totalWatchers = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getWatcher).sum();
-        int totalPRreviewComments = repositoryData.stream()
+        int totalPrActivity = repositoryData.stream()
                                                   .mapToInt(
-                                                          AggregateEventData.RepositoryData::getComments)
+                                                          AggregateEventData.RepositoryData::getPullRequestEvents)
                                                   .sum();
 
-        int totalNewActivity = totalBranches + totalForks + totalPRreviewComments + totalWatchers + totalPushes;
+        int totalNewActivity = totalBranches + totalIssuesActivity + totalPrActivity + totalWatchers + totalPushes;
 
         Map<String, Double> percentPerActivity = new HashMap<>();
         percentPerActivity.put("pushes", percentageOfTotal(totalNewActivity, totalPushes));
-        percentPerActivity.put("forks", percentageOfTotal(totalNewActivity, totalForks));
+        percentPerActivity.put("issues_activity", percentageOfTotal(totalNewActivity, totalIssuesActivity));
         percentPerActivity.put("branches", percentageOfTotal(totalNewActivity, totalBranches));
-        percentPerActivity.put("comments", percentageOfTotal(totalNewActivity, totalPRreviewComments));
+        percentPerActivity.put("pull_request_activity", percentageOfTotal(totalNewActivity, totalPrActivity));
         percentPerActivity.put("watchers", percentageOfTotal(totalNewActivity, totalWatchers));
         return percentPerActivity;
     }

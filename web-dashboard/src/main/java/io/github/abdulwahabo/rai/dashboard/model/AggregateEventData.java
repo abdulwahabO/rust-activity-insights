@@ -33,11 +33,11 @@ public class AggregateEventData {
     public static class RepositoryData {
 
         private String repository;
-        private int forks;
+        private int issuesEvents; // All issues events.
         private int watcher;
         private int branches;
         private int pushes;
-        private int comments;
+        private int pullRequestEvents; // All PR events.
 
         public int getWatcher() {
             return watcher;
@@ -58,24 +58,20 @@ public class AggregateEventData {
             this.repository = repository;
         }
 
-        /**
-         *  todo: this is PR review comments.
-         * @return
-         */
-        public int getComments() {
-            return comments;
+        public int getPullRequestEvents() {
+            return pullRequestEvents;
         }
 
-        public void setComments(int comments) {
-            this.comments = comments;
+        public void setPullRequestEvents(int pullRequestEvents) {
+            this.pullRequestEvents = pullRequestEvents;
         }
 
-        public int getForks() {
-            return forks;
+        public int getIssuesEvents() {
+            return issuesEvents;
         }
 
-        public void setForks(int forks) {
-            this.forks = forks;
+        public void setIssuesEvents(int issuesEvents) {
+            this.issuesEvents = issuesEvents;
         }
 
         public int getPushes() {

@@ -38,7 +38,7 @@ public class DashboardServiceTest {
         assertEquals(15.9, percentages.get("watchers"));
         assertEquals(5.7, percentages.get("branches"));
 
-        Map<String, Integer> pushes = dataDto.getPushesPerRepo();
+        Map<String, Integer> pushes = dataDto.getTopIssuesActivity();
 
         int repo2pushes = pushes.get("repo_2");
         int repo1pushes = pushes.get("repo_1");

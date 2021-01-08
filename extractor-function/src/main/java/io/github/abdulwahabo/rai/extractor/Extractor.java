@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,7 +32,7 @@ public class Extractor {
     private static final String EVENTS_API_URL = "https://api.github.com/orgs/rust-lang/events";
     private static final Path ETAG_STORAGE_FILE = Paths.get("/tmp", "etag.txt");
 
-    private static final String S3_BUCKET_NAME = "github-rustlang-events";
+    private static final String S3_BUCKET_NAME = "filebox-storage";
     private static final String S3_OBJECT_KEY = "rust_activities_data";
     private Logger logger = LoggerFactory.getLogger(Extractor.class);
 
@@ -48,7 +49,7 @@ public class Extractor {
     private final Function<GithubEventDto, S3EventDto> eventDtoMapper = (githubEventDto -> {
         S3EventDto s3EventDto = new S3EventDto();
         s3EventDto.setRepository(githubEventDto.getRepo().getName());
-        LocalDateTime dateTime = LocalDateTime.parse(githubEventDto.getTime());
+        LocalDateTime dateTime = LocalDateTime.parse(githubEventDto.getTime(), DateTimeFormatter.ISO_DATE_TIME);
         s3EventDto.setDate(dateTime.toLocalDate().toString());
         s3EventDto.setType(githubEventDto.getType());
         return s3EventDto;

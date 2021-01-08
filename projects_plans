@@ -20,7 +20,6 @@
 
 		--> A SIMPLE bar chart showing ---> The top five repositories in terms of pushes.. use Comparator o
 
-		--> A stripped table with columns ----> Details of each repository for that period.
 
   		--> A date range picker (Use date range picker library)
 					----> THIS IS IMPORTANT SO THE PROJECT IS INTERACTIVE, OTHERWISE THE GIF WOULD LOOK DRAB.
