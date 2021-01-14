@@ -18,7 +18,7 @@ public class DashboardController {
 
     private DashboardService dashboardService;
 
-    @Value("${TODO}") // todo: make sure host ends without slash.
+    @Value("${host}")
     private String host;
 
     @Autowired
@@ -35,7 +35,7 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public ModelAndView dashboard(ModelMap modelMap) {
-        modelMap.addAttribute("api_url", host.concat("/data"));
+        modelMap.addAttribute("api_url", host.concat("/data?"));
         return new ModelAndView("dashboard");
     }
 }

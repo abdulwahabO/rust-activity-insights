@@ -34,33 +34,33 @@ public class DashboardServiceTest {
         DashboardDataDto dataDto = service.getData(startDate, endDate);
         Map<String, Double> percentages = dataDto.getActivitiesPercentage();
 
-        assertEquals(26.4, percentages.get("forks"));
+        assertEquals(26.4, percentages.get("issues_activity"));
         assertEquals(15.9, percentages.get("watchers"));
         assertEquals(5.7, percentages.get("branches"));
 
-        Map<String, Integer> pushes = dataDto.getTopIssuesActivity();
+        Map<String, Integer> topIssuesActivity = dataDto.getTopIssuesActivity();
 
-        int repo2pushes = pushes.get("repo_2");
-        int repo1pushes = pushes.get("repo_1");
+        int repo2pushes = topIssuesActivity.get("repo_2");
+        int repo1pushes = topIssuesActivity.get("repo_1");
 
-        assertEquals(36, repo2pushes);
-        assertEquals(27, repo1pushes);
+        assertEquals(28, repo2pushes);
+        assertEquals(70, repo1pushes);
     }
 
     private List<AggregateEventData> mockData() {
 
         AggregateEventData.RepositoryData repo1 = new AggregateEventData.RepositoryData();
-        repo1.setComments(45);
+        repo1.setPullRequestEvents(45);
         repo1.setWatcher(23);
-        repo1.setForks(38);
+        repo1.setIssuesEvents(38);
         repo1.setPushes(15);
         repo1.setBranches(2);
         repo1.setRepository("repo_1");
 
         AggregateEventData.RepositoryData repo2 = new AggregateEventData.RepositoryData();
-        repo2.setComments(42);
+        repo2.setPullRequestEvents(42);
         repo2.setWatcher(13);
-        repo2.setForks(21);
+        repo2.setIssuesEvents(21);
         repo2.setPushes(19);
         repo2.setBranches(6);
         repo2.setRepository("repo_2");
@@ -70,17 +70,17 @@ public class DashboardServiceTest {
         data1.setRepositoryData(Arrays.asList(repo1, repo2));
 
         AggregateEventData.RepositoryData repo3 = new AggregateEventData.RepositoryData();
-        repo3.setComments(41);
+        repo3.setPullRequestEvents(41);
         repo3.setWatcher(20);
-        repo3.setForks(32);
+        repo3.setIssuesEvents(32);
         repo3.setPushes(12);
         repo3.setBranches(4);
         repo3.setRepository("repo_1");
 
         AggregateEventData.RepositoryData repo4 = new AggregateEventData.RepositoryData();
-        repo4.setComments(2);
+        repo4.setPullRequestEvents(2);
         repo4.setWatcher(3);
-        repo4.setForks(7);
+        repo4.setIssuesEvents(7);
         repo4.setPushes(17);
         repo4.setBranches(9);
         repo4.setRepository("repo_2");

@@ -37,7 +37,6 @@ public class DashboardService {
             for (AggregateEventData eventData : aggregateEventData) {
                 List<AggregateEventData.RepositoryData> repositoryDataList = eventData.getRepositoryData();
                 for (AggregateEventData.RepositoryData data : repositoryDataList) {
-
                     if (repositoryDataMap.containsKey(data.getRepository())) {
                         AggregateEventData.RepositoryData oldValue = repositoryDataMap.get(data.getRepository());
                         oldValue.setBranches(oldValue.getBranches() + data.getBranches());
@@ -45,6 +44,7 @@ public class DashboardService {
                         oldValue.setPushes(oldValue.getPushes() + data.getPushes());
                         oldValue.setWatcher(oldValue.getWatcher() + data.getWatcher());
                         oldValue.setPullRequestEvents(oldValue.getPullRequestEvents() + data.getPullRequestEvents());
+                        repositoryDataMap.put(data.getRepository(), oldValue);
                     } else {
                         repositoryDataMap.put(data.getRepository(), data);
                     }
