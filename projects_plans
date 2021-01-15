@@ -36,11 +36,10 @@
 		- A text paragraph that explains the table so that it's column's names need not be overly descriptive. 
 		- A 12-width column below them holding the table.
 
->>> Business Case:
+>>> Business Case: K.I.S.S
 
 		(Todo: write this) -- Not much to say, the real objective of this project is using Apache Spark and AWS.
 
-        // todo -- the pipeline is not very robust and doesn't handle possible error cases.
 
 
 >>> Portfolio site should describe project as phases in pipeline

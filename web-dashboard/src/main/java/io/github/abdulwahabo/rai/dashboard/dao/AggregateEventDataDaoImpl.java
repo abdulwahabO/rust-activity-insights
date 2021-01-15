@@ -2,34 +2,36 @@ package io.github.abdulwahabo.rai.dashboard.dao;
 
 import io.github.abdulwahabo.rai.dashboard.model.AggregateEventData;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 @Service
 public class AggregateEventDataDaoImpl implements AggregateEventDataDao {
 
-    @Value("dynamodb.table") // TODO: put value in properties file.
-    private String dynamoDbTAble;
-
     @Override
     public Optional<List<AggregateEventData>> get(String startDate, String endDate) {
-        Key start = Key.builder().partitionValue(startDate).build();
-        Key end = Key.builder().partitionValue(endDate).build();
-        QueryConditional conditional = QueryConditional.sortBetween(start, end);
-        List<AggregateEventData> data = dbTable().query(conditional).items().stream().collect(Collectors.toList());
-        return Optional.of(data);
+        LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        List<AggregateEventData> dataList = dbTable().scan().items().stream().filter(data -> {
+           LocalDate date = LocalDate.parse(data.getDate());
+           boolean result = false;
+           if (date.isEqual(start) || date.isEqual(end) || (date.isAfter(start) && date.isBefore(end))) {
+               result = true;
+           }
+           return result;
+        }).collect(Collectors.toList());
+        return Optional.of(dataList);
     }
 
     private DynamoDbTable<AggregateEventData> dbTable() {
@@ -41,6 +43,6 @@ public class AggregateEventDataDaoImpl implements AggregateEventDataDao {
                                                                         .dynamoDbClient(dynamoDbClient)
                                                                         .build();
 
-        return dbEnhancedClient.table(dynamoDbTAble, TableSchema.fromBean(AggregateEventData.class));
+        return dbEnhancedClient.table("rust-event-data", TableSchema.fromBean(AggregateEventData.class));
     }
 }

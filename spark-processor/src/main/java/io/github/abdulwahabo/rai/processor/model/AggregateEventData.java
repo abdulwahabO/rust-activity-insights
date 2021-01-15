@@ -17,7 +17,7 @@ public class AggregateEventData {
     }
 
     public void setRepositoryData(List<RepositoryData> repositoryData) {
-        this.repositoryData = repositoryData;
+        this.repositoryData = new ArrayList<>(repositoryData);
     }
 
     @DynamoDbPartitionKey
@@ -29,7 +29,9 @@ public class AggregateEventData {
         this.date = date;
     }
 
-    // todo:: Exists for Spark usage only.. so encoder can be created.
+    /**
+     * Only necessary for creating a Spark encoder that works for a List of RepositoryData.s
+     */
     public static class RepositoryDataWrapper {
 
         private List<RepositoryData> repositoryDataList = new ArrayList<>();
@@ -47,11 +49,11 @@ public class AggregateEventData {
     public static class RepositoryData {
 
         private String repository;
-        private int issuesEvents; // All issues events.
+        private int issuesEvents; // All types of issues events.
         private int watcher;
         private int branches;
         private int pushes;
-        private int pullRequestEvents; // All PR events.
+        private int pullRequestEvents; // All types of PR events.
 
         public int getWatcher() {
             return watcher;
