@@ -63,16 +63,16 @@ public class DashboardService {
         }
     }
 
-    // TODO: Explain what this does....
+    // Returns the top five repositories in terms of issues activity.
     private Map<String, Integer> topIssuesActivity(List<AggregateEventData.RepositoryData> repositoryData) {
-        repositoryData.sort(Comparator.comparingInt(AggregateEventData.RepositoryData::getIssuesEvents));
+        repositoryData.sort(Comparator.comparingInt(AggregateEventData.RepositoryData::getIssuesEvents).reversed());
         return repositoryData.stream()
                              .limit(5)
                              .collect(Collectors.toMap(AggregateEventData.RepositoryData::getRepository,
                                      AggregateEventData.RepositoryData::getIssuesEvents));
     }
 
-    // TODO: Explain what this does..,..
+    // Calculate the percentage of events contributed by each activity
     private Map<String, Double> percentPerActivity(List<AggregateEventData.RepositoryData> repositoryData) {
 
         int totalPushes = repositoryData.stream().mapToInt(AggregateEventData.RepositoryData::getPushes).sum();
