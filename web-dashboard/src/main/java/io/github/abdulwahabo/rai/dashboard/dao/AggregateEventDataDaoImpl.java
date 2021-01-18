@@ -23,6 +23,10 @@ public class AggregateEventDataDaoImpl implements AggregateEventDataDao {
     public Optional<List<AggregateEventData>> get(String startDate, String endDate) {
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+        // This is quite hacky and would cause performance issues if the table has a lot of items.
+        // Best way to approach this is to remodel the data so that the 'date' field is used as sort key
+        // and a 'repository' field is used as partition key.
         List<AggregateEventData> dataList = dbTable().scan().items().stream().filter(data -> {
            LocalDate date = LocalDate.parse(data.getDate());
            boolean result = false;
