@@ -5,14 +5,11 @@ import java.util.Map;
 
 public class DashboardDataDto {
 
-    // todo; use for simple barchart.
     @JsonProperty("repo_issues_activity")
     private Map<String, Integer> topIssuesActivity;
 
-    // todo: use for for doughnut pie chart.
     @JsonProperty("activities_percentage")
     private Map<String, Double> activitiesPercentage;
-    // todo: percentages of each activity for period.
 
     public Map<String, Integer> getTopIssuesActivity() {
         return topIssuesActivity;

@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface AggregateEventDataDao {
 
-    // TODO: we need query, not get.
     Optional<List<AggregateEventData>> get(String startDate, String endDate);
 }
